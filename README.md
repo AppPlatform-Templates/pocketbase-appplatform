@@ -224,9 +224,9 @@ For production use with persistent data, you have two options:
 
 **Note**: PocketBase only supports SQLite databases. It does not support PostgreSQL or other database engines.
 
-#### Option 2: Wait for NFS Support (Q1 2026)
+#### Option 2: Wait for NFS Support
 
-DigitalOcean App Platform will support persistent volumes via NFS in Q1 2026. Once available, you can mount persistent storage for the SQLite database directly.
+DigitalOcean App Platform will support persistent volumes via NFS will likely be available in early 2026. Once available, you can mount persistent storage for the SQLite database directly.
 
 See `PRODUCTION.md` for detailed Litestream setup and production hardening steps.
 
@@ -400,8 +400,8 @@ PocketBase uses SQLite:
 
 ## Limitations
 
-- **Ephemeral Storage**: Only 2GiB, wiped on each deployment
-- **No Persistent Volumes**: Until Q1 2026 NFS support
+- **Ephemeral Storage**: Only 2GiB, wiped on each deployment. Must use litestream for streaming backup to DigitalOcean Spaces
+- **No Persistent Volumes**: Until early 2026 NFS support
 - **No SSH Access**: App Platform is a managed PaaS
 - **Build Timeout**: 1 hour maximum
 - **Region**: Must choose from available App Platform regions

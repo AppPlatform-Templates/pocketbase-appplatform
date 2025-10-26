@@ -24,7 +24,7 @@ A complete, production-ready todo application demonstrating:
 3. **Download and run the example**:
    ```bash
    # Download the example
-   curl -O https://raw.githubusercontent.com/bikram20/pocketbase-appplatform/main/examples/todo-app.html
+   curl -O https://raw.githubusercontent.com/AppPlatform-Templates/pocketbase-appplatform/main/examples/todo-app.html
 
    # Open in browser
    open todo-app.html
@@ -218,7 +218,7 @@ Want to extend this example? Try adding:
 - **E-commerce**: Products, cart, and orders
 - **File Manager**: Upload, organize, and share files
 
-Want to contribute an example? [Submit a PR](https://github.com/bikram20/pocketbase-appplatform/pulls)!
+Want to contribute an example? [Submit a PR](https://github.com/AppPlatform-Templates/pocketbase-appplatform/pulls)!
 
 ## Resources
 
@@ -259,5 +259,5 @@ If you see CORS errors:
 
 Need help?
 - Check [USING_POCKETBASE.md](../USING_POCKETBASE.md) for detailed documentation
-- Open an issue: https://github.com/bikram20/pocketbase-appplatform/issues
+- Open an issue: https://github.com/AppPlatform-Templates/pocketbase-appplatform/issues
 - PocketBase community: https://github.com/pocketbase/pocketbase/discussions

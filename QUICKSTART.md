@@ -15,7 +15,7 @@ Get PocketBase v0.31.0 running on DigitalOcean App Platform in 5 minutes.
 
 1. Click this button:
 
-   [![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/bikram20/pocketbase-appplatform/tree/main)
+   [![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/AppPlatform-Templates/pocketbase-appplatform/tree/main)
 
 2. Sign in to DigitalOcean
 3. Click **"Deploy"**
@@ -26,7 +26,7 @@ Get PocketBase v0.31.0 running on DigitalOcean App Platform in 5 minutes.
 1. Go to https://cloud.digitalocean.com/apps
 2. Click **"Create App"**
 3. Choose **"GitHub"**
-4. Select repository: `bikram20/pocketbase-appplatform`
+4. Select repository: `AppPlatform-Templates/pocketbase-appplatform`
 5. Branch: `main`
 6. Click **"Next"** → **"Next"** → **"Deploy"**
 

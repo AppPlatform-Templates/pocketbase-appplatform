@@ -11,7 +11,7 @@ services:
   - name: pocketbase
     # Source configuration
     github:
-      repo: bikram20/pocketbase-appplatform
+      repo: AppPlatform-Templates/pocketbase-appplatform
       branch: main
       deploy_on_push: true
 

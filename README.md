@@ -12,7 +12,7 @@ PocketBase is an open source Go backend that includes:
 
 ## Quick Deploy
 
-[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/bikram20/pocketbase-appplatform/tree/main)
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/AppPlatform-Templates/pocketbase-appplatform/tree/main)
 
 Click the button above to deploy PocketBase to DigitalOcean App Platform in one click.
 
@@ -32,7 +32,7 @@ We've built a complete working example to show you how to use PocketBase:
 
 ```bash
 # Download the example
-curl -O https://raw.githubusercontent.com/bikram20/pocketbase-appplatform/main/examples/todo-app.html
+curl -O https://raw.githubusercontent.com/AppPlatform-Templates/pocketbase-appplatform/main/examples/todo-app.html
 
 # Update the PocketBase URL in the file (line 169)
 # Then open in browser

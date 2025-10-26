@@ -10,10 +10,8 @@ region: nyc
 services:
   - name: pocketbase
     # Source configuration
-    # TODO: Update this to your forked repository
-    # Example: YOUR_USERNAME/pocketbase-appplatform
     github:
-      repo: YOUR_USERNAME/pocketbase-appplatform
+      repo: bikram20/pocketbase-appplatform
       branch: main
       deploy_on_push: true
 

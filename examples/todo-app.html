@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PocketBase Todo App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .auth-section, .app-section { margin-bottom: 30px; }
+        .hidden { display: none !important; }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #666;
+            font-size: 16px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #eee;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #5a6268;
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        button.danger:hover {
+            background: #c82333;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .user-email {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .todo-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .todos-container {
+            display: grid;
+            gap: 15px;
+        }
+        .todo-item {
+            background: #fff;
+            border: 2px solid #eee;
+            padding: 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .todo-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+        .todo-item.completed {
+            opacity: 0.6;
+            background: #f8f9fa;
+        }
+        .todo-item.completed h3 {
+            text-decoration: line-through;
+        }
+        .todo-item h3 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .todo-item p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .todo-item .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .todo-item button {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Auth Section -->
+        <div id="auth-section">
+            <h1>🚀 PocketBase Todo App</h1>
+            <p class="subtitle">A complete example of using PocketBase for authentication and CRUD operations</p>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('login')">Login</button>
+                <button class="tab" onclick="switchTab('signup')">Sign Up</button>
+            </div>
+
+            <div id="login-tab" class="tab-content active">
+                <form onsubmit="login(event)">
+                    <input type="email" id="login-email" placeholder="Email" required autocomplete="email">
+                    <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+
+            <div id="signup-tab" class="tab-content">
+                <form onsubmit="signUp(event)">
+                    <input type="email" id="signup-email" placeholder="Email" required autocomplete="email">
+                    <input type="password" id="signup-password" placeholder="Password (min 8 characters)" required autocomplete="new-password" minlength="8">
+                    <input type="password" id="signup-password-confirm" placeholder="Confirm Password" required autocomplete="new-password" minlength="8">
+                    <button type="submit">Create Account</button>
+                </form>
+            </div>
+
+            <div id="auth-message"></div>
+        </div>
+
+        <!-- App Section -->
+        <div id="app-section" class="hidden">
+            <div class="header">
+                <div>
+                    <h1>📝 My Todos</h1>
+                    <p class="user-email" id="user-email"></p>
+                </div>
+                <button class="secondary" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="todo-form">
+                <h3 style="margin-bottom: 15px; color: #333;">Add New Todo</h3>
+                <form onsubmit="createTodo(event)">
+                    <input type="text" id="todo-title" placeholder="What needs to be done?" required>
+                    <textarea id="todo-description" placeholder="Add a description (optional)"></textarea>
+                    <button type="submit">Add Todo</button>
+                </form>
+            </div>
+
+            <div id="todos-container" class="todos-container"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import PocketBase from 'https://cdn.jsdelivr.net/npm/pocketbase@0.21.5/+esm'
+
+        // ============================================
+        // CONFIGURATION - UPDATE THIS WITH YOUR URL
+        // ============================================
+        const POCKETBASE_URL = 'https://pocketbase-nr39q.ondigitalocean.app'
+
+        // Initialize PocketBase
+        const pb = new PocketBase(POCKETBASE_URL)
+        window.pb = pb
+
+        // Check if user is already logged in
+        if (pb.authStore.isValid) {
+            showApp()
+            loadTodos()
+            subscribeToTodos()
+        }
+
+        // Tab switching
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'))
+
+            event.target.classList.add('active')
+            document.getElementById(tab + '-tab').classList.add('active')
+        }
+
+        // Show message
+        function showMessage(message, type = 'error') {
+            const messageDiv = document.getElementById('auth-message')
+            messageDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`
+            setTimeout(() => messageDiv.innerHTML = '', 5000)
+        }
+
+        // Sign Up
+        window.signUp = async function(e) {
+            e.preventDefault()
+            const email = document.getElementById('signup-email').value
+            const password = document.getElementById('signup-password').value
+            const passwordConfirm = document.getElementById('signup-password-confirm').value
+
+            if (password !== passwordConfirm) {
+                showMessage('Passwords do not match!')
+                return
+            }
+
+            try {
+                await pb.collection('users').create({
+                    email,
+                    password,
+                    passwordConfirm
+                })
+
+                showMessage('Account created successfully! Please login.', 'success')
+
+                // Switch to login tab
+                document.querySelectorAll('.tab')[0].click()
+                document.getElementById('login-email').value = email
+            } catch (error) {
+                showMessage('Error: ' + error.message)
+            }
+        }
+
+        // Login
+        window.login = async function(e) {
+            e.preventDefault()
+            const email = document.getElementById('login-email').value
+            const password = document.getElementById('login-password').value
+
+            try {
+                await pb.collection('users').authWithPassword(email, password)
+                showApp()
+                loadTodos()
+                subscribeToTodos()
+            } catch (error) {
+                showMessage('Error: ' + error.message)
+            }
+        }
+
+        // Logout
+        window.logout = function() {
+            pb.authStore.clear()
+            pb.collection('todos').unsubscribe()
+            document.getElementById('auth-section').classList.remove('hidden')
+            document.getElementById('app-section').classList.add('hidden')
+            document.getElementById('todos-container').innerHTML = ''
+        }
+
+        // Show app section
+        function showApp() {
+            document.getElementById('auth-section').classList.add('hidden')
+            document.getElementById('app-section').classList.remove('hidden')
+            document.getElementById('user-email').textContent = pb.authStore.model.email
+        }
+
+        // Create Todo
+        window.createTodo = async function(e) {
+            e.preventDefault()
+            const title = document.getElementById('todo-title').value
+            const description = document.getElementById('todo-description').value
+
+            try {
+                await pb.collection('todos').create({
+                    title,
+                    description,
+                    completed: false,
+                    user: pb.authStore.model.id
+                })
+
+                // Clear form
+                document.getElementById('todo-title').value = ''
+                document.getElementById('todo-description').value = ''
+
+                // Reload todos (realtime will also update)
+                loadTodos()
+            } catch (error) {
+                alert('Error: ' + error.message + '\n\nMake sure you created the "todos" collection in PocketBase admin!')
+            }
+        }
+
+        // Load Todos
+        window.loadTodos = async function() {
+            try {
+                const records = await pb.collection('todos').getFullList({
+                    sort: '-created'
+                })
+
+                displayTodos(records)
+            } catch (error) {
+                console.error('Error loading todos:', error)
+                const container = document.getElementById('todos-container')
+                container.innerHTML = `
+                    <div class="alert alert-error">
+                        <strong>Error loading todos!</strong><br>
+                        Make sure you created the "todos" collection in PocketBase admin dashboard.<br>
+                        See <a href="https://github.com/bikram20/pocketbase-appplatform/blob/main/USING_POCKETBASE.md" target="_blank">USING_POCKETBASE.md</a> for setup instructions.
+                    </div>
+                `
+            }
+        }
+
+        // Display Todos
+        function displayTodos(todos) {
+            const container = document.getElementById('todos-container')
+
+            if (todos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <h3>No todos yet!</h3>
+                        <p>Create your first todo above to get started.</p>
+                    </div>
+                `
+                return
+            }
+
+            container.innerHTML = todos.map(todo => `
+                <div class="todo-item ${todo.completed ? 'completed' : ''}">
+                    <h3>${escapeHtml(todo.title)}</h3>
+                    ${todo.description ? `<p>${escapeHtml(todo.description)}</p>` : ''}
+                    <div class="actions">
+                        <button onclick="toggleTodo('${todo.id}', ${!todo.completed})">
+                            ${todo.completed ? '↩️ Incomplete' : '✅ Complete'}
+                        </button>
+                        <button class="danger" onclick="deleteTodo('${todo.id}')">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('')
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div')
+            div.textContent = text
+            return div.innerHTML
+        }
+
+        // Toggle Todo Completion
+        window.toggleTodo = async function(id, completed) {
+            try {
+                await pb.collection('todos').update(id, { completed })
+                // Realtime will update automatically
+            } catch (error) {
+                alert('Error: ' + error.message)
+            }
+        }
+
+        // Delete Todo
+        window.deleteTodo = async function(id) {
+            if (!confirm('Delete this todo?')) return
+
+            try {
+                await pb.collection('todos').delete(id)
+                // Realtime will update automatically
+            } catch (error) {
+                alert('Error: ' + error.message)
+            }
+        }
+
+        // Subscribe to realtime updates
+        function subscribeToTodos() {
+            pb.collection('todos').subscribe('*', function (e) {
+                console.log('Realtime update:', e.action, e.record)
+                loadTodos() // Reload todos on any change
+            })
+        }
+    </script>
+</body>
+</html>

@@ -16,6 +16,55 @@ PocketBase is an open source Go backend that includes:
 
 Click the button above to deploy PocketBase to DigitalOcean App Platform in one click.
 
+## 🚀 Using PocketBase
+
+Once deployed, you need to **use** PocketBase to build applications. Here's how:
+
+### 1. Create Your Admin Account
+
+Visit `https://your-app-url.ondigitalocean.app/_/` and create your first admin account.
+
+**Important**: There's no default admin. You must create one on first visit.
+
+### 2. Try the Example Todo App
+
+We've built a complete working example to show you how to use PocketBase:
+
+```bash
+# Download the example
+curl -O https://raw.githubusercontent.com/bikram20/pocketbase-appplatform/main/examples/todo-app.html
+
+# Update the PocketBase URL in the file (line 169)
+# Then open in browser
+open todo-app.html
+```
+
+**Features demonstrated**:
+- User authentication (sign up, login)
+- CRUD operations (create, read, update, delete)
+- Realtime updates
+- User-specific data
+
+### 3. Build Your Own Application
+
+Follow our comprehensive guide:
+
+**📖 [Complete Usage Guide: USING_POCKETBASE.md](USING_POCKETBASE.md)**
+
+This guide includes:
+- Step-by-step setup instructions
+- Creating collections (database tables)
+- Setting up security rules
+- Building a complete Todo app
+- User authentication
+- Realtime subscriptions
+- File uploads
+- Code examples (HTML, React)
+
+**📂 [Working Examples: examples/](examples/)**
+
+Download and run ready-to-use example applications.
+
 ## Architecture
 
 This deployment uses:

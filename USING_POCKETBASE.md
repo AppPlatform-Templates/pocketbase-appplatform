@@ -35,7 +35,12 @@ After deploying PocketBase, you need to create an admin account:
 
 4. **You're logged in!** You'll see the PocketBase Admin Dashboard.
 
-> **Important**: There's no default admin account. You MUST create this on first visit. If you're using ephemeral storage (SQLite), this admin will be lost on redeployment.
+> **⚠️ IMPORTANT**:
+> - There's no default admin account - you MUST create this on first visit
+> - **Create your admin IMMEDIATELY** after deployment (before the app is publicly accessible)
+> - If someone else accesses `/_/` first, they'll create the admin account
+> - If using ephemeral storage (SQLite), this admin will be lost on redeployment
+> - If you lose your password, see [Troubleshooting](#lost-admin-password--cant-access-admin-ui)
 
 ### Step 2: Explore the Admin Dashboard
 
@@ -918,6 +923,67 @@ If testing locally:
 2. Check browser console for errors
 3. Verify WebSocket/SSE isn't blocked by firewall
 4. Try unsubscribe and subscribe again
+
+### Lost Admin Password / Can't Access Admin UI
+
+If you see the "Superuser login" screen instead of "Create your first admin", it means an admin account was already created. If you've lost the password or don't know the credentials:
+
+#### Option 1: Redeploy the App (Wipes All Data)
+
+This creates a fresh PocketBase instance with no data:
+
+```bash
+# Get your app ID (if you don't know it)
+doctl apps list
+
+# Trigger a new deployment (force rebuild)
+doctl apps create-deployment YOUR_APP_ID --force-build --wait
+```
+
+Replace `YOUR_APP_ID` with your actual App Platform app ID.
+
+**Example:**
+```bash
+doctl apps create-deployment 6a300681-df86-4a5e-8a30-0ab51321bb63 --force-build --wait
+```
+
+After redeployment:
+1. **Immediately** go to `https://your-app-url.ondigitalocean.app/_/`
+2. Create your admin account
+3. Start fresh
+
+⚠️ **Warning**: This will delete ALL data (users, collections, records) since we're using ephemeral SQLite storage.
+
+#### Option 2: Migrate to PostgreSQL (Recommended for Production)
+
+If you need to preserve data, migrate to PostgreSQL first:
+
+1. Follow the production migration guide in [PRODUCTION.md](PRODUCTION.md)
+2. Add a managed PostgreSQL database to your app
+3. Your data will persist across deployments
+4. Use PocketBase's admin management features to reset passwords
+
+#### Option 3: Delete and Recreate App
+
+If you want a completely new app:
+
+```bash
+# Delete the current app
+doctl apps delete YOUR_APP_ID --force
+
+# Create a new app
+doctl apps create --spec .do/app.yaml --wait
+```
+
+This gives you a fresh app with a new URL.
+
+#### Prevention Tips
+
+1. **Create admin immediately** after deployment (before the app is publicly accessible)
+2. **Use strong, saved passwords** (password manager recommended)
+3. **Migrate to PostgreSQL** for production (data persists)
+4. **Create multiple admin accounts** (Settings → Admins in admin UI)
+5. **Document your credentials** securely
 
 ---
 

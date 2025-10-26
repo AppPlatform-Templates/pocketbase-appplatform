@@ -2,7 +2,8 @@
 # DigitalOcean App Platform Spec for PocketBase
 #
 # This configuration deploys PocketBase with ephemeral SQLite storage.
-# For production use, consider migrating to a managed PostgreSQL database.
+# For production use, configure Litestream to backup SQLite to DigitalOcean Spaces.
+# See README.md for Litestream setup instructions.
 #
 name: pocketbase
 region: nyc
@@ -44,6 +45,24 @@ services:
         value: "info"
         scope: RUN_TIME
 
+      # Litestream configuration (optional - for production backups)
+      # Uncomment and configure these to enable automatic SQLite backups to DigitalOcean Spaces
+      # See README.md for setup instructions
+
+      # - key: LITESTREAM_ACCESS_KEY_ID
+      #   value: "your-spaces-access-key-id"
+      #   scope: RUN_TIME
+      #   type: SECRET
+
+      # - key: LITESTREAM_SECRET_ACCESS_KEY
+      #   value: "your-spaces-secret-access-key"
+      #   scope: RUN_TIME
+      #   type: SECRET
+
+      # - key: REPLICA_URL
+      #   value: "s3://your-space-name.nyc3.digitaloceanspaces.com/pocketbase-db"
+      #   scope: RUN_TIME
+
     # Routes
     routes:
       - path: /
@@ -62,19 +81,9 @@ services:
     #   allow_headers:
     #     - "*"
 
-# Optional: Add a managed PostgreSQL database for production
-# Uncomment the section below and update PocketBase to use PostgreSQL
-# databases:
-#   - name: db
-#     engine: PG
-#     version: "16"
-#     production: false
-#     cluster_name: pocketbase-db
-#     db_name: pocketbase
-#     db_user: pocketbase
-
 # Notes:
-# 1. SQLite storage is EPHEMERAL - data will be lost on each deployment
-# 2. For production, migrate to PostgreSQL (see documentation)
+# 1. SQLite storage is EPHEMERAL - data will be lost on each deployment without backups
+# 2. For production, configure Litestream to backup to DigitalOcean Spaces (see README.md)
 # 3. Maximum 2GiB local storage available
 # 4. Database file location: /app/pb_data/data.db
+# 5. PocketBase only supports SQLite (PostgreSQL is NOT supported)

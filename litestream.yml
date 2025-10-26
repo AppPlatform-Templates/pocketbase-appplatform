@@ -1,0 +1,25 @@
+# Litestream configuration for PocketBase SQLite database replication
+#
+# This configuration enables continuous replication of the PocketBase database
+# to DigitalOcean Spaces (S3-compatible object storage).
+#
+# Required environment variables:
+# - LITESTREAM_ACCESS_KEY_ID: Your DigitalOcean Spaces access key
+# - LITESTREAM_SECRET_ACCESS_KEY: Your DigitalOcean Spaces secret key
+# - REPLICA_URL: S3-compatible URL for your Space (e.g., s3://your-space.nyc3.digitaloceanspaces.com/pocketbase-db)
+
+# Access credentials (using environment variables for security)
+access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
+secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}
+
+# Database replication configuration
+dbs:
+  - path: /app/pb_data/data.db
+    replicas:
+      - url: ${REPLICA_URL}
+        # Retention settings
+        retention: 168h  # Keep snapshots for 7 days
+        retention-check-interval: 24h  # Check retention daily
+        snapshot-interval: 24h  # Create full snapshots daily
+        # Sync interval (how often to push WAL changes)
+        sync-interval: 1s  # Sync every second for near real-time replication

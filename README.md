@@ -22,9 +22,26 @@ Once deployed, you need to **use** PocketBase to build applications. Here's how:
 
 ### 1. Create Your Admin Account
 
-Visit `https://your-app-url.ondigitalocean.app/_/` and create your first admin account.
+**Important**: The admin UI is not accessible until you create a superuser via the console.
 
-**Important**: There's no default admin. You must create one on first visit.
+To create your first admin account:
+
+1. In your DigitalOcean dashboard:
+   - Go to **Apps**
+   - Click on your PocketBase app
+   - Click on your service component (e.g., "pocketbase")
+   - Click the **Console** tab
+   - Click **Run command**
+
+2. Run this command in the console:
+   ```bash
+   ./pocketbase superuser create your-email@example.com your-password
+   ```
+
+3. After creating the superuser, access the admin UI at:
+   ```
+   https://your-app-url.ondigitalocean.app/_/
+   ```
 
 ### 2. Try the Example Todo App
 
@@ -175,8 +192,8 @@ Once deployed, you can access:
 
 ### Initial Setup
 
-1. Navigate to the Admin UI (`/_/`)
-2. Create your admin account
+1. Create your admin account via the App Platform Console (see "Create Your Admin Account" section above)
+2. Navigate to the Admin UI at `/_/`
 3. Start creating collections and configuring your backend
 
 ## Storage Considerations
@@ -195,27 +212,125 @@ This setup is ideal for:
 
 ### Production (Recommended)
 
-For production use, you have two options:
+For production use with persistent data, you have two options:
 
-#### Option 1: Wait for NFS Support (Q1 2026)
-DigitalOcean App Platform will support persistent volumes via NFS in Q1 2026. Once available, you can mount persistent storage for the SQLite database.
+#### Option 1: Use Litestream for SQLite Backup (Available Now)
 
-#### Option 2: Migrate to PostgreSQL (Available Now)
+**Litestream** provides continuous replication of your SQLite database to DigitalOcean Spaces. This template includes built-in Litestream support:
 
-PocketBase supports PostgreSQL as a database backend. To use PostgreSQL:
+- **Automatic backups**: Continuously replicates your database to object storage
+- **Disaster recovery**: Automatically restores from backup on container restart
+- **Easy setup**: Just configure environment variables (see Production Setup section below)
 
-1. **Add a managed database** to your app:
-   - In `.do/app.yaml`, uncomment the `databases` section
-   - Or add via the DigitalOcean control panel
+**Note**: PocketBase only supports SQLite databases. It does not support PostgreSQL or other database engines.
 
-2. **Update the run command** to use PostgreSQL:
-   ```yaml
-   run_command: /app/pocketbase serve --http=0.0.0.0:8080 --db.type=postgres --db.conn=${db.DATABASE_URL}
-   ```
+#### Option 2: Wait for NFS Support (Q1 2026)
 
-3. **Redeploy** your app
+DigitalOcean App Platform will support persistent volumes via NFS in Q1 2026. Once available, you can mount persistent storage for the SQLite database directly.
 
-See `PRODUCTION.md` for detailed production hardening steps.
+See `PRODUCTION.md` for detailed Litestream setup and production hardening steps.
+
+## Production Setup: Litestream Backup
+
+### What is Litestream?
+
+[Litestream](https://litestream.io) is a streaming replication tool for SQLite databases. It continuously backs up your database to object storage (DigitalOcean Spaces) and can automatically restore it on container restart.
+
+### Why Use Litestream?
+
+- **Automatic Backups**: Continuous replication to DigitalOcean Spaces
+- **Disaster Recovery**: Auto-restore database when container restarts
+- **Cost-Effective**: ~$5/month for Spaces vs $15/month for managed database
+- **Zero Downtime**: Replication happens in the background
+- **SQLite Performance**: Keep using fast local SQLite with cloud backup
+
+### Quick Setup
+
+**Step 1: Create a DigitalOcean Space**
+
+1. Go to [DigitalOcean Spaces](https://cloud.digitalocean.com/spaces)
+2. Click **Create a Space**
+3. Choose a region (e.g., `nyc3`)
+4. Name your space (e.g., `my-pocketbase-backups`)
+5. Click **Create a Space**
+
+**Step 2: Generate API Keys**
+
+1. Go to [API Tokens](https://cloud.digitalocean.com/account/api/tokens)
+2. Scroll to **Spaces access keys**
+3. Click **Generate New Key**
+4. Name it (e.g., `pocketbase-litestream`)
+5. Save the **Access Key** and **Secret Key** (you'll need these)
+
+**Step 3: Configure Environment Variables**
+
+In your App Platform dashboard:
+
+1. Go to your PocketBase app
+2. Click **Settings** → **App-Level Environment Variables**
+3. Add these three variables:
+
+   | Key | Value | Type |
+   |-----|-------|------|
+   | `LITESTREAM_ACCESS_KEY_ID` | Your Spaces access key | Secret |
+   | `LITESTREAM_SECRET_ACCESS_KEY` | Your Spaces secret key | Secret |
+   | `REPLICA_URL` | `s3://YOUR-SPACE-NAME.REGION.digitaloceanspaces.com/pocketbase-db` | Regular |
+
+   Replace:
+   - `YOUR-SPACE-NAME` with your actual space name
+   - `REGION` with your space region (e.g., `nyc3`)
+
+4. Click **Save** and redeploy your app
+
+**That's it!** Your database is now being backed up continuously to DigitalOcean Spaces.
+
+### Verifying Backups
+
+Check your app logs to confirm Litestream is working:
+
+```bash
+doctl apps logs YOUR_APP_ID --type run
+```
+
+You should see:
+```
+✓ Litestream environment variables detected
+Starting PocketBase with Litestream replication...
+```
+
+You can also check your Space in the DO dashboard - you should see backup files appearing.
+
+### Restoring from Backup
+
+Litestream automatically restores your database when the container starts. If your database is lost (e.g., after redeployment), Litestream will:
+
+1. Detect the missing database
+2. Restore it from the latest backup in Spaces
+3. Start PocketBase with your data intact
+
+No manual intervention required!
+
+### Cost
+
+- **Spaces Storage**: $5/month for 250 GB + 1 TB transfer
+- **Typical Usage**: < 1 GB for most PocketBase databases
+- **Total**: ~$5/month for production-grade backups
+
+### Troubleshooting
+
+**Backups not working?**
+
+1. Check environment variables are set correctly
+2. Verify your Spaces access key has write permissions
+3. Check logs for Litestream errors: `doctl apps logs YOUR_APP_ID --type run`
+
+**Database not restoring?**
+
+1. Ensure `REPLICA_URL` matches your Space name and region
+2. Check that backup files exist in your Space
+3. Look for restoration logs on container startup
+
+For more details, see `PRODUCTION.md` and the [Litestream documentation](https://litestream.io/guides/digitalocean/).
 
 ## Scaling
 
@@ -260,30 +375,28 @@ Check the runtime logs:
 
 ### Database Issues
 
-If using SQLite:
-- Remember data is ephemeral
-- Check you're not exceeding 2GiB storage
-
-If using PostgreSQL:
-- Verify `DATABASE_URL` is set correctly
-- Check database connectivity from the app
+PocketBase uses SQLite:
+- Remember data is ephemeral without Litestream backups
+- Check you're not exceeding 2GiB local storage
+- If using Litestream, verify environment variables are set correctly
+- Check Litestream logs for replication errors
 
 ### Performance Issues
 
 - Monitor CPU/memory usage in Insights
 - Consider upgrading instance size
-- For PostgreSQL, check connection pool settings
+- Check Litestream replication is not causing bottlenecks
 
 ## Cost Estimate
 
-### Minimal Setup (SQLite)
+### Minimal Setup (SQLite without backups)
 - **Service**: $12/month (apps-s-1vcpu-1gb)
 - **Total**: ~$12/month
 
-### Production Setup (PostgreSQL)
+### Production Setup (SQLite + Litestream)
 - **Service**: $12/month (apps-s-1vcpu-1gb)
-- **Managed DB**: $15/month (basic PostgreSQL)
-- **Total**: ~$27/month
+- **DigitalOcean Spaces**: $5/month (250 GB storage + 1 TB transfer)
+- **Total**: ~$17/month
 
 ## Limitations
 

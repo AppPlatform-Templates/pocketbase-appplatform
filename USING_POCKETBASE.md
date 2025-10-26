@@ -937,14 +937,14 @@ This creates a fresh PocketBase instance with no data:
 doctl apps list
 
 # Trigger a new deployment (force rebuild)
-doctl apps create-deployment YOUR_APP_ID --force-build --wait
+doctl apps create-deployment YOUR_APP_ID --force-rebuild --wait
 ```
 
 Replace `YOUR_APP_ID` with your actual App Platform app ID.
 
 **Example:**
 ```bash
-doctl apps create-deployment 6a300681-df86-4a5e-8a30-0ab51321bb63 --force-build --wait
+doctl apps create-deployment 6a300681-df86-4a5e-8a30-0ab51321bb63 --force-rebuild --wait
 ```
 
 After redeployment:

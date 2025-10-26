@@ -1,0 +1,82 @@
+#
+# DigitalOcean App Platform Spec for PocketBase
+#
+# This configuration deploys PocketBase with ephemeral SQLite storage.
+# For production use, consider migrating to a managed PostgreSQL database.
+#
+name: pocketbase
+region: nyc
+
+services:
+  - name: pocketbase
+    # Source configuration
+    # TODO: Update this to your forked repository
+    # Example: YOUR_USERNAME/pocketbase-appplatform
+    github:
+      repo: YOUR_USERNAME/pocketbase-appplatform
+      branch: main
+      deploy_on_push: true
+
+    # Build configuration
+    dockerfile_path: Dockerfile
+
+    # Optional: Override PocketBase version (default: v0.31.0)
+    # Uncomment to build a different version:
+    # build_command: docker build --build-arg POCKETBASE_VERSION=v0.32.0 -t $IMAGE_NAME .
+
+    # Instance configuration
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb
+
+    # HTTP configuration
+    http_port: 8080
+
+    # Health check
+    health_check:
+      http_path: /api/health
+      initial_delay_seconds: 10
+      period_seconds: 10
+      timeout_seconds: 3
+      success_threshold: 1
+      failure_threshold: 3
+
+    # Environment variables
+    envs:
+      - key: PB_LOG_LEVEL
+        value: "info"
+        scope: RUN_TIME
+
+    # Routes
+    routes:
+      - path: /
+
+    # CORS configuration (optional - uncomment if needed)
+    # cors:
+    #   allow_origins:
+    #     - prefix: "*"
+    #   allow_methods:
+    #     - GET
+    #     - POST
+    #     - PUT
+    #     - PATCH
+    #     - DELETE
+    #     - OPTIONS
+    #   allow_headers:
+    #     - "*"
+
+# Optional: Add a managed PostgreSQL database for production
+# Uncomment the section below and update PocketBase to use PostgreSQL
+# databases:
+#   - name: db
+#     engine: PG
+#     version: "16"
+#     production: false
+#     cluster_name: pocketbase-db
+#     db_name: pocketbase
+#     db_user: pocketbase
+
+# Notes:
+# 1. SQLite storage is EPHEMERAL - data will be lost on each deployment
+# 2. For production, migrate to PostgreSQL (see documentation)
+# 3. Maximum 2GiB local storage available
+# 4. Database file location: /app/pb_data/data.db

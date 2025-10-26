@@ -1,0 +1,50 @@
+#
+# Deploy to DigitalOcean Button Configuration for PocketBase
+#
+# This template allows users to deploy PocketBase with one click
+#
+spec:
+  name: pocketbase
+  region: nyc
+
+  services:
+    - name: pocketbase
+      github:
+        repo: pocketbase/pocketbase
+        branch: master
+        deploy_on_push: true
+
+      dockerfile_path: Dockerfile
+
+      instance_count: 1
+      instance_size_slug: apps-s-1vcpu-1gb
+
+      http_port: 8080
+
+      health_check:
+        http_path: /api/health
+        initial_delay_seconds: 10
+        period_seconds: 10
+        timeout_seconds: 3
+        success_threshold: 1
+        failure_threshold: 3
+
+      envs:
+        - key: PB_LOG_LEVEL
+          value: "info"
+          scope: RUN_TIME
+          type: GENERAL
+
+      routes:
+        - path: /
+
+# Deployment customization for users
+features:
+  - buildpack-stack=ubuntu-22
+
+# Optional features users can enable
+# databases:
+#   - engine: PG
+#     name: db
+#     production: false
+#     version: "16"

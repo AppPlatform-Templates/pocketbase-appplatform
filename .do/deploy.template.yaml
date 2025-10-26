@@ -3,42 +3,42 @@
 #
 # This template allows users to deploy PocketBase with one click
 #
-name: pocketbase
+spec:
+  name: pocketbase
 
-services:
-  - name: pocketbase
-    github:
-      repo: AppPlatform-Templates/pocketbase-appplatform
-      branch: main
-      deploy_on_push: true
+  services:
+    - name: pocketbase
+      git:
+        branch: main
+        repo_clone_url: https://github.com/AppPlatform-Templates/pocketbase-appplatform.git
 
-    dockerfile_path: Dockerfile
+      dockerfile_path: Dockerfile
 
-    instance_count: 1
-    instance_size_slug: apps-s-1vcpu-1gb
+      instance_count: 1
+      instance_size_slug: apps-s-1vcpu-1gb
 
-    http_port: 8080
+      http_port: 8080
 
-    health_check:
-      http_path: /api/health
-      initial_delay_seconds: 10
-      period_seconds: 10
-      timeout_seconds: 3
-      success_threshold: 1
-      failure_threshold: 3
+      health_check:
+        http_path: /api/health
+        initial_delay_seconds: 10
+        period_seconds: 10
+        timeout_seconds: 3
+        success_threshold: 1
+        failure_threshold: 3
 
-    envs:
-      - key: PB_LOG_LEVEL
-        value: "info"
-        scope: RUN_TIME
+      envs:
+        - key: PB_LOG_LEVEL
+          value: "info"
+          scope: RUN_TIME
 
-    routes:
-      - path: /
+      routes:
+        - path: /
 
-# Optional: Add a managed PostgreSQL database for production
-# Uncomment the section below to enable
-# databases:
-#   - name: db
-#     engine: PG
-#     version: "16"
-#     production: false
+  # Optional: Add a managed PostgreSQL database for production
+  # Uncomment the section below to enable
+  # databases:
+  #   - name: db
+  #     engine: PG
+  #     version: "16"
+  #     production: false

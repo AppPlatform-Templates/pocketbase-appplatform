@@ -928,9 +928,50 @@ If testing locally:
 
 If you see the "Superuser login" screen instead of "Create your first admin", it means an admin account was already created. If you've lost the password or don't know the credentials:
 
-#### Option 1: Redeploy the App (Wipes All Data)
+#### Option 1: Create Superuser via Console (Recommended)
 
-This creates a fresh PocketBase instance with no data:
+This is the official PocketBase method - creates a new admin without losing data:
+
+**Step 1: Access App Platform Console**
+
+In your DigitalOcean dashboard:
+1. Go to [Apps](https://cloud.digitalocean.com/apps)
+2. Click on your PocketBase app
+3. Click on your service component (e.g., "pocketbase")
+4. Click **"Console"** tab
+5. Click **"Run command"** or use the console interface
+
+**Step 2: Create Superuser**
+
+Run this command in the console:
+
+```bash
+./pocketbase superuser create your-email@example.com your-password
+```
+
+**Example:**
+```bash
+./pocketbase superuser create admin@mycompany.com SecurePass123!
+```
+
+You'll see:
+```
+Successfully created new superuser "admin@mycompany.com"!
+```
+
+**Step 3: Login**
+
+Go to `https://your-app-url.ondigitalocean.app/_/` and login with your new credentials!
+
+✅ **Advantages:**
+- No data loss
+- Fast (< 1 minute)
+- Official PocketBase method
+- Creates additional admin (doesn't delete existing one)
+
+#### Option 2: Redeploy the App (Wipes All Data)
+
+If you can't access the console, this creates a fresh PocketBase instance with no data:
 
 ```bash
 # Get your app ID (if you don't know it)
@@ -954,7 +995,7 @@ After redeployment:
 
 ⚠️ **Warning**: This will delete ALL data (users, collections, records) since we're using ephemeral SQLite storage.
 
-#### Option 2: Migrate to PostgreSQL (Recommended for Production)
+#### Option 3: Migrate to PostgreSQL (Recommended for Production)
 
 If you need to preserve data, migrate to PostgreSQL first:
 
@@ -963,7 +1004,7 @@ If you need to preserve data, migrate to PostgreSQL first:
 3. Your data will persist across deployments
 4. Use PocketBase's admin management features to reset passwords
 
-#### Option 3: Delete and Recreate App
+#### Option 4: Delete and Recreate App
 
 If you want a completely new app:
 

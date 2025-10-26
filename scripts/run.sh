@@ -14,7 +14,7 @@ if [ -n "$LITESTREAM_ACCESS_KEY_ID" ] && [ -n "$LITESTREAM_SECRET_ACCESS_KEY" ] 
     # Restore database from replica if it doesn't exist locally
     if [ ! -f /app/pb_data/data.db ]; then
         echo "Database not found locally. Attempting to restore from replica..."
-        litestream restore -v -if-replica-exists -config /etc/litestream.yml /app/pb_data/data.db
+        litestream restore -if-replica-exists -config /etc/litestream.yml /app/pb_data/data.db
 
         if [ -f /app/pb_data/data.db ]; then
             echo "✓ Database restored successfully from replica"
